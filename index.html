@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Learning for NLP — LAU</title>
+<meta name="description" content="Deep Learning for Natural Language Processing — course lecture slides by Dr. Chadi Helwe, Department of Computer Science, Lebanese American University.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230E3B29%27/%3E%3Ctext%20x%3D%2716%27%20y%3D%2721%27%20font-family%3D%27Georgia%2Cserif%27%20font-weight%3D%27700%27%20font-size%3D%2711%27%20letter-spacing%3D%27-0.5%27%20fill%3D%27%23ffffff%27%20text-anchor%3D%27middle%27%3ENLP%3C/text%3E%3C/svg%3E">
+<!-- Social share preview -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Deep Learning for Natural Language Processing">
+<meta property="og:description" content="Course lecture slides — from words and tokens to transformers. Dr. Chadi Helwe, Lebanese American University.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deep Learning for Natural Language Processing">
+<meta name="twitter:description" content="Course lecture slides — from words and tokens to transformers. Dr. Chadi Helwe, Lebanese American University.">
+<style>
+  /* ============================================================
+     Deep Learning for NLP — LAU
+     Concept: NLP is the seam between human language and machine math.
+       · Serif (Charter)  = language  → titles, prose, lecture names
+       · Monospace        = machine   → numbers, labels, links, tokens
+     Signature: the title, re-rendered as tokenizer output.
+     Structure: ten lectures on a single sequence "spine".
+     ============================================================ */
+
+  :root {
+    /* paper (light) */
+    --ground:    #EEF2EA;
+    --ink:       #17231C;
+    --muted:     #5A695E;
+    --line:      #D6DDCE;
+    --card:      #F6F8F2;
+    /* forest */
+    --forest:      #0E3B29;
+    --forest-deep: #0A2C1F;
+    --band-text: #EAF1EA;
+    --band-sub:  #A7BEAF;
+    --band-line: rgba(233,244,236,.16);
+    /* accents */
+    --link:   #14663F;   /* readable green link on paper */
+    --signal: #46B27B;   /* "activation" — live/hover only */
+
+    --serif: "Charter","Hoefler Text","Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --mono:  ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:#0B120E; --ink:#E7ECE6; --muted:#8FA096; --line:#212D25; --card:#111A14;
+      --forest:#0A2C1F; --forest-deep:#071E15;
+      --band-text:#EAF1EA; --band-sub:#9DB4A6; --band-line:rgba(233,244,236,.13);
+      --link:#6FC79A; --signal:#5FCB8E;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#EEF2EA; --ink:#17231C; --muted:#5A695E; --line:#D6DDCE; --card:#F6F8F2;
+    --forest:#0E3B29; --forest-deep:#0A2C1F; --band-text:#EAF1EA; --band-sub:#A7BEAF;
+    --band-line:rgba(233,244,236,.16); --link:#14663F; --signal:#46B27B;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0B120E; --ink:#E7ECE6; --muted:#8FA096; --line:#212D25; --card:#111A14;
+    --forest:#0A2C1F; --forest-deep:#071E15; --band-text:#EAF1EA; --band-sub:#9DB4A6;
+    --band-line:rgba(233,244,236,.13); --link:#6FC79A; --signal:#5FCB8E;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--serif); font-size:18px; line-height:1.6;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  }
+  .wrap{ max-width:860px; margin:0 auto; padding:0 32px; }
+  a{ color:var(--link); text-underline-offset:3px; }
+  a:hover{ color:var(--ink); }
+  :focus-visible{ outline:2px solid var(--signal); outline-offset:3px; border-radius:2px; }
+
+  .mono{ font-family:var(--mono); }
+  .eyebrow{
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.24em;
+    text-transform:uppercase; color:var(--muted);
+  }
+
+  /* ---------------- Hero band ---------------- */
+  .hero{ background:var(--forest); color:var(--band-text); border-bottom:1px solid var(--signal); }
+  .hero .wrap{ padding:38px 32px 46px; }
+  .lau-logo{ height:82px; width:auto; display:block; margin:0 0 34px; }
+  .lau-wordmark{ margin:0 0 34px; font-weight:700; font-size:1.2rem; color:#fff; }
+  .lau-wordmark[hidden]{ display:none; }
+  .lau-wordmark:not([hidden]){ display:block; }
+
+  .hero .kicker{ color:var(--band-sub); margin:0 0 20px; }
+  h1.title{
+    font-family:var(--serif); font-weight:700;
+    font-size:clamp(2.5rem,6.2vw,4rem); line-height:1.02;
+    letter-spacing:-.018em; margin:0; color:#fff; text-wrap:balance;
+  }
+  @media (prefers-color-scheme:dark){ h1.title{ color:var(--band-text); } }
+  :root[data-theme="dark"] h1.title{ color:var(--band-text); }
+
+  /* Signature: title as tokenizer output */
+  .tokens{ display:flex; flex-wrap:wrap; gap:6px; margin:22px 0 0; }
+  .tk{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.02em;
+    color:var(--band-sub); padding:3px 8px; border-radius:5px;
+    border:1px solid var(--band-line); white-space:nowrap;
+  }
+  .tk-sub{ color:var(--band-sub); opacity:.72; }        /* subword continuation */
+  .tk-special{ color:var(--signal); border-color:color-mix(in srgb,var(--signal) 55%,transparent); }
+
+  .lede{ color:var(--band-sub); max-width:56ch; margin:26px 0 0; font-size:1.06rem; }
+
+  /* ---------------- Meta strip ---------------- */
+  .meta{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:20px 30px; padding:26px 0 30px; border-bottom:1px solid var(--line);
+  }
+  .meta dt{
+    font-family:var(--mono); font-size:.64rem; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--link); margin:0 0 4px;
+  }
+  .meta dd{ margin:0; font-size:1rem; }
+  .meta dd a{ word-break:break-word; }
+
+  /* ---------------- About ---------------- */
+  .about{ padding:34px 0 6px; }
+  .about p{ max-width:62ch; margin:0; }
+  .sources{ margin-top:24px !important; font-size:.98rem; color:var(--muted); line-height:1.8; }
+  .sources-label{
+    display:block; margin-bottom:8px;
+    font-family:var(--mono); font-size:.64rem; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--link);
+  }
+  .src-item{ display:block; line-height:1.7; }
+  .src-item + .src-item{ margin-top:5px; }
+  .sources a{ font-style:italic; color:var(--link); }
+  .sources a:hover{ color:var(--signal); }
+  .sources .by{ color:var(--muted); }
+  .sources .ed{
+    font-family:var(--mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:2px 6px;
+    margin:0 2px; white-space:nowrap;
+  }
+
+  /* ---------------- Sequence ---------------- */
+  .seq-head{ padding:40px 0 6px; }
+  .seq-head .eyebrow{ display:flex; align-items:center; gap:12px; }
+  .seq-head .eyebrow::before{ content:""; width:22px; height:1px; background:var(--signal); }
+  .seq-head h2{
+    font-family:var(--serif); font-weight:600; font-size:1.15rem;
+    margin:12px 0 0; color:var(--muted); font-style:italic;
+  }
+
+  ol.seq{ list-style:none; margin:16px 0 0; padding:0; }
+  li.step{
+    position:relative;
+    display:grid; grid-template-columns:56px 1fr auto; gap:4px 22px;
+    align-items:start; padding:22px 0;
+  }
+  /* the spine: a vertical line through the index column */
+  li.step::before{
+    content:""; position:absolute; left:27px; top:0; bottom:0;
+    width:1.5px; background:var(--line);
+  }
+  li.step:first-child::before{ top:37px; }
+  li.step:last-child::before{ bottom:calc(100% - 37px); }
+
+  .idx{
+    position:relative; z-index:1; justify-self:center;
+    font-family:var(--mono); font-size:.82rem; font-weight:600; color:var(--muted);
+    background:var(--ground); padding:6px 0; margin-top:15px; line-height:1;
+    transition:color .2s ease;
+  }
+  .step:hover .idx,
+  .step:focus-within .idx{ color:var(--signal); }
+
+  .step-body{ padding-top:6px; }
+  .step-title{
+    font-family:var(--serif); font-weight:600; font-size:clamp(1.28rem,2.4vw,1.55rem);
+    line-height:1.2; margin:0; color:var(--ink); text-wrap:balance;
+    transition:color .2s ease;
+  }
+  .step:hover .step-title{ color:var(--forest); }
+  @media (prefers-color-scheme:dark){ .step:hover .step-title{ color:var(--signal); } }
+  :root[data-theme="dark"] .step:hover .step-title{ color:var(--signal); }
+  .step-topic{ margin:6px 0 0; color:var(--muted); font-style:italic; font-size:1rem; }
+
+  /* slides link / placeholder */
+  .step-slides{ grid-column:3; align-self:start; justify-self:end; padding-top:12px; }
+  a.slink{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+    text-decoration:none; color:var(--link); white-space:nowrap;
+    border-bottom:1px solid transparent; padding-bottom:2px;
+  }
+  a.slink:hover{ color:var(--signal); border-bottom-color:var(--signal); }
+  a.slink .arw{ transition:transform .2s ease; }
+  a.slink:hover .arw{ transform:translateX(3px); }
+  span.slink.soon{
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); opacity:.6; white-space:nowrap;
+  }
+
+  /* ---------------- Report an issue ---------------- */
+  .fix{
+    margin:44px 0 0; padding:22px 0 0; border-top:1px solid var(--line);
+    font-family:var(--mono); font-size:.82rem; color:var(--muted);
+  }
+  .fix a{ color:var(--link); }
+  .fix a:hover{ color:var(--signal); }
+
+  /* ---------------- Footer ---------------- */
+  footer{ margin-top:56px; background:var(--forest-deep); color:var(--band-sub); }
+  footer .wrap{ padding:30px 32px 42px; display:flex; flex-wrap:wrap; gap:6px 20px;
+    align-items:baseline; justify-content:space-between; }
+  footer .fbrand{ font-family:var(--serif); color:#fff; font-size:1.05rem; }
+  footer .fmeta{ font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; }
+
+  /* ---------------- Theme toggle ---------------- */
+  .toggle{
+    position:fixed; top:16px; right:16px; z-index:10;
+    font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--band-text); background:rgba(10,44,31,.55); border:1px solid var(--band-line);
+    padding:7px 12px; border-radius:100px; cursor:pointer; backdrop-filter:blur(6px);
+  }
+  .toggle:hover{ border-color:var(--signal); color:#fff; }
+
+  /* ---------------- Load reveal ----------------
+     Content is visible by default; it is only hidden *while* it will be
+     animated back in — so the hero can never end up blank. */
+  @keyframes rise{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{ opacity:0; animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+    .d1{ animation-delay:.05s; } .d2{ animation-delay:.14s; } .d3{ animation-delay:.24s; }
+    .d4{ animation-delay:.34s; }
+    .tokens .tk{ opacity:0; animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards; }
+    .tokens .tk:nth-child(1){animation-delay:.30s}.tokens .tk:nth-child(2){animation-delay:.35s}
+    .tokens .tk:nth-child(3){animation-delay:.40s}.tokens .tk:nth-child(4){animation-delay:.45s}
+    .tokens .tk:nth-child(5){animation-delay:.50s}.tokens .tk:nth-child(6){animation-delay:.55s}
+    .tokens .tk:nth-child(7){animation-delay:.60s}.tokens .tk:nth-child(8){animation-delay:.65s}
+    .tokens .tk:nth-child(9){animation-delay:.70s}.tokens .tk:nth-child(10){animation-delay:.75s}
+    .tokens .tk:nth-child(11){animation-delay:.80s}
+  }
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width:560px){
+    body{ font-size:16.5px; }
+    .hero .wrap{ padding:30px 24px 38px; }
+    li.step{ grid-template-columns:40px 1fr; gap:4px 16px; }
+    li.step::before{ left:19px; }
+    .idx{ margin-top:13px; }
+    .step-slides{ grid-column:2; justify-self:start; padding-top:10px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+  <button class="toggle" id="themeToggle" type="button" aria-label="Toggle light or dark theme">Light / Dark</button>
+
+  <!-- ==================== HERO ==================== -->
+  <header class="hero">
+    <div class="wrap">
+      <!-- LAU logo: transparent white PNG in this folder. Replace lau-logo.png to swap it. -->
+      <img id="lauLogo" class="lau-logo reveal" src="lau-logo.png" alt="Lebanese American University"
+           onerror="document.getElementById('lauWordmark').hidden=false; this.remove();">
+      <span id="lauWordmark" class="lau-wordmark" hidden>Lebanese American University</span>
+
+      <p class="kicker eyebrow reveal d1">School of Arts &amp; Sciences · Department of Computer Science</p>
+      <h1 class="title reveal d2">Deep Learning for<br>Natural Language Processing</h1>
+
+      <!-- Signature: the title above, as a tokenizer would see it. Decorative → hidden from AT. -->
+      <div class="tokens" aria-hidden="true">
+        <span class="tk tk-special">[CLS]</span>
+        <span class="tk">deep</span>
+        <span class="tk">learn</span>
+        <span class="tk tk-sub">##ing</span>
+        <span class="tk">for</span>
+        <span class="tk">natural</span>
+        <span class="tk">lang</span>
+        <span class="tk tk-sub">##uage</span>
+        <span class="tk">process</span>
+        <span class="tk tk-sub">##ing</span>
+        <span class="tk tk-special">[SEP]</span>
+      </div>
+
+      <p class="lede reveal d4">A course that traces how a machine learns to read — from words
+        and tokens to transformers. Every deck is linked below, free to use.</p>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- ==================== META ==================== -->
+    <!-- EDIT your details here -->
+    <dl class="meta">
+      <div>
+        <dt>Instructor</dt>
+        <dd>Dr. Chadi Helwe</dd>
+      </div>
+      <div>
+        <dt>Contact</dt>
+        <dd><a href="mailto:chadi.helwe@lau.edu.lb">chadi.helwe@lau.edu.lb</a></dd>
+      </div>
+    </dl>
+
+    <!-- ==================== ABOUT ==================== -->
+    <section class="about">
+      <p>The course builds one idea at a time: how text becomes tokens, how early language models
+        predict the next word, how machine learning and neural networks learn from data, and how
+        embeddings and transformers reshaped what's possible. Each lecture assumes the one before it
+        — read them in order, or jump to the topic you need.</p>
+
+      <p class="sources">
+        <span class="sources-label">Slides build on two textbooks</span>
+        <span class="src-item">
+          <a href="https://web.stanford.edu/~jurafsky/slp3/" target="_blank" rel="noopener">Speech and Language Processing</a>
+          <span class="ed">3rd ed., draft</span>
+          <span class="by">— Jurafsky &amp; Martin</span>
+        </span>
+        <span class="src-item">
+          <a href="https://niutrans.github.io/NLPBook/" target="_blank" rel="noopener">Natural Language Processing: Neural Networks and Large Language Models</a>
+          <span class="by">— Xiao &amp; Zhu</span>
+        </span>
+      </p>
+    </section>
+
+    <!-- ==================== THE SEQUENCE ==================== -->
+    <section class="seq-head">
+      <p class="eyebrow">The curriculum</p>
+      <h2>Read as a sequence — each lecture builds on the one before it.</h2>
+    </section>
+
+    <ol class="seq">
+
+      <li class="step">
+        <span class="idx">01</span>
+        <div class="step-body">
+          <h3 class="step-title">Introduction to NLP</h3>
+          <p class="step-topic">what NLP is, the tasks it tackles, and why language is hard</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-1-introduction-to-nlp/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">02</span>
+        <div class="step-body">
+          <h3 class="step-title">Words and Tokens</h3>
+          <p class="step-topic">tokenization, normalization, and turning text into units</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-2-words-and-tokens/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">03</span>
+        <div class="step-body">
+          <h3 class="step-title">N-gram Language Models</h3>
+          <p class="step-topic">counting, probability, smoothing, and predicting the next word</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-3-n-gram-language-models/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">04</span>
+        <div class="step-body">
+          <h3 class="step-title">Introduction to Machine Learning</h3>
+          <p class="step-topic">classification, features, training, and evaluation</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-4-introduction-to-machine-learning/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">05</span>
+        <div class="step-body">
+          <h3 class="step-title">Neural Networks</h3>
+          <p class="step-topic">perceptrons, backpropagation, and learning representations</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-5-neural-networks/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">06</span>
+        <div class="step-body">
+          <h3 class="step-title">Word Representations and Embeddings</h3>
+          <p class="step-topic">Word2Vec, GloVe, and the geometry of meaning</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-6-word-representations-and-embeddings/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">07</span>
+        <div class="step-body">
+          <h3 class="step-title">Convolutional &amp; Recurrent Neural Networks</h3>
+          <p class="step-topic">CNNs and RNNs for modeling text and sequences</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-7-convolutional-neural-networks-and-recurrent-neural-networks/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">08</span>
+        <div class="step-body">
+          <h3 class="step-title">Transformers</h3>
+          <p class="step-topic">self-attention, positional encoding, and the architecture behind it all</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-8-transformers/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+      <li class="step">
+        <span class="idx">09</span>
+        <div class="step-body">
+          <h3 class="step-title">Transformers: NLP Applications</h3>
+          <p class="step-topic">BERT, text classification, machine translation, and text generation</p>
+        </div>
+        <div class="step-slides">
+          <a class="slink" href="Lectures/lecture-9-transformers-nlp-applications/index.html">slides <span class="arw">→</span></a>
+        </div>
+      </li>
+
+    </ol>
+
+    <!-- ==================== REPORT AN ISSUE ==================== -->
+    <p class="fix">
+      Found a mistake or a broken link in the slides — or have a question?
+      <a href="mailto:chadi.helwe@lau.edu.lb?subject=Deep%20Learning%20for%20NLP">Email me</a>
+      — corrections and questions are welcome.
+    </p>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer>
+    <div class="wrap">
+      <span class="fbrand">Deep Learning for NLP</span>
+      <span class="fmeta">Lebanese American University</span>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle: system → light → dark, no persistence (single self-contained file).
+    (function(){
+      var root = document.documentElement;
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        var cur = root.getAttribute('data-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.setAttribute('data-theme', !cur ? (prefersDark ? 'light' : 'dark') : (cur === 'light' ? 'dark' : 'light'));
+      });
+    })();
+  </script>
+</body>
+</html>
