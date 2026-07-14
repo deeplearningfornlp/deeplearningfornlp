@@ -88,7 +88,7 @@
   .lau-wordmark[hidden]{ display:none; }
   .lau-wordmark:not([hidden]){ display:block; }
 
-  .hero .kicker{ color:var(--band-sub); margin:0 0 20px; }
+  .hero .kicker{ color:var(--band-text); margin:0 0 20px; }
   h1.title{
     font-family:var(--serif); font-weight:700;
     font-size:clamp(2.5rem,6.2vw,4rem); line-height:1.02;
@@ -101,13 +101,13 @@
   .tokens{ display:flex; flex-wrap:wrap; gap:6px; margin:22px 0 0; }
   .tk{
     font-family:var(--mono); font-size:.72rem; letter-spacing:.02em;
-    color:var(--band-sub); padding:3px 8px; border-radius:5px;
+    color:var(--band-text); padding:3px 8px; border-radius:5px;
     border:1px solid var(--band-line); white-space:nowrap;
   }
-  .tk-sub{ color:var(--band-sub); opacity:.72; }        /* subword continuation */
-  .tk-special{ color:var(--signal); border-color:color-mix(in srgb,var(--signal) 55%,transparent); }
+  .tk-sub{ color:var(--band-text); opacity:.8; }        /* subword continuation */
+  .tk-special{ color:#78BE20; border-color:color-mix(in srgb,#78BE20 60%,transparent); }
 
-  .lede{ color:var(--band-sub); max-width:56ch; margin:26px 0 0; font-size:1.06rem; }
+  .lede{ color:var(--band-text); max-width:56ch; margin:26px 0 0; font-size:1.06rem; }
 
   /* ---------------- Meta strip ---------------- */
   .meta{
@@ -213,7 +213,7 @@
   footer .wrap{ padding:30px 32px 42px; display:flex; flex-wrap:wrap; gap:6px 20px;
     align-items:baseline; justify-content:space-between; }
   footer .fbrand{ font-family:var(--serif); color:#fff; font-size:1.05rem; }
-  footer .fmeta{ font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; }
+  footer .fmeta{ font-family:var(--mono); font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:#fff; }
 
   /* ---------------- Theme toggle ---------------- */
   .toggle{
