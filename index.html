@@ -30,15 +30,15 @@
     --muted:     #5A695E;
     --line:      #D6DDCE;
     --card:      #F6F8F2;
-    /* forest */
-    --forest:      #0E3B29;
-    --forest-deep: #0A2C1F;
+    /* LAU dark green (Pantone 336/432 — official) */
+    --forest:      #006751;
+    --forest-deep: #004C45;
     --band-text: #EAF1EA;
     --band-sub:  #A7BEAF;
     --band-line: rgba(233,244,236,.16);
-    /* accents */
-    --link:   #14663F;   /* readable green link on paper */
-    --signal: #46B27B;   /* "activation" — live/hover only */
+    /* accents (LAU secondary greens) */
+    --link:   #006751;   /* official LAU green link on paper */
+    --signal: #009B77;   /* "activation" — live/hover only */
 
     --serif: "Charter","Hoefler Text","Iowan Old Style","Palatino Linotype",Georgia,serif;
     --mono:  ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
@@ -46,20 +46,20 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --ground:#0B120E; --ink:#E7ECE6; --muted:#8FA096; --line:#212D25; --card:#111A14;
-      --forest:#0A2C1F; --forest-deep:#071E15;
+      --forest:#006751; --forest-deep:#004C45;
       --band-text:#EAF1EA; --band-sub:#9DB4A6; --band-line:rgba(233,244,236,.13);
-      --link:#6FC79A; --signal:#5FCB8E;
+      --link:#35C79A; --signal:#00C389;
     }
   }
   :root[data-theme="light"]{
     --ground:#EEF2EA; --ink:#17231C; --muted:#5A695E; --line:#D6DDCE; --card:#F6F8F2;
-    --forest:#0E3B29; --forest-deep:#0A2C1F; --band-text:#EAF1EA; --band-sub:#A7BEAF;
-    --band-line:rgba(233,244,236,.16); --link:#14663F; --signal:#46B27B;
+    --forest:#006751; --forest-deep:#004C45; --band-text:#EAF1EA; --band-sub:#A7BEAF;
+    --band-line:rgba(233,244,236,.16); --link:#006751; --signal:#009B77;
   }
   :root[data-theme="dark"]{
     --ground:#0B120E; --ink:#E7ECE6; --muted:#8FA096; --line:#212D25; --card:#111A14;
-    --forest:#0A2C1F; --forest-deep:#071E15; --band-text:#EAF1EA; --band-sub:#9DB4A6;
-    --band-line:rgba(233,244,236,.13); --link:#6FC79A; --signal:#5FCB8E;
+    --forest:#006751; --forest-deep:#004C45; --band-text:#EAF1EA; --band-sub:#9DB4A6;
+    --band-line:rgba(233,244,236,.13); --link:#35C79A; --signal:#00C389;
   }
 
   *{ box-sizing:border-box; }
@@ -209,7 +209,7 @@
   .fix a:hover{ color:var(--signal); }
 
   /* ---------------- Footer ---------------- */
-  footer{ margin-top:56px; background:var(--forest-deep); color:var(--band-sub); }
+  footer{ margin-top:56px; background:var(--forest); color:var(--band-sub); }
   footer .wrap{ padding:30px 32px 42px; display:flex; flex-wrap:wrap; gap:6px 20px;
     align-items:baseline; justify-content:space-between; }
   footer .fbrand{ font-family:var(--serif); color:#fff; font-size:1.05rem; }
@@ -219,7 +219,7 @@
   .toggle{
     position:fixed; top:16px; right:16px; z-index:10;
     font-family:var(--mono); font-size:.62rem; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--band-text); background:rgba(10,44,31,.55); border:1px solid var(--band-line);
+    color:var(--band-text); background:rgba(0,76,69,.55); border:1px solid var(--band-line);
     padding:7px 12px; border-radius:100px; cursor:pointer; backdrop-filter:blur(6px);
   }
   .toggle:hover{ border-color:var(--signal); color:#fff; }
@@ -254,6 +254,7 @@
     *{ transition:none !important; }
   }
 </style>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "5cb2353e35a94e14be4a7c7897599c8c"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
 <body>
   <button class="toggle" id="themeToggle" type="button" aria-label="Toggle light or dark theme">Light / Dark</button>
@@ -306,10 +307,11 @@
 
     <!-- ==================== ABOUT ==================== -->
     <section class="about">
-      <p>The course builds one idea at a time: how text becomes tokens, how early language models
-        predict the next word, how machine learning and neural networks learn from data, and how
-        embeddings and transformers reshaped what's possible. Each lecture assumes the one before it
-        — read them in order, or jump to the topic you need.</p>
+      <p>Today's language models can write, translate, and answer questions — but none of it is magic.
+        This course rebuilds that capability from the ground up, one idea at a time: how raw text becomes
+        tokens, how early models learned to predict the next word, how machine learning and neural networks
+        find patterns in data, and how embeddings and transformers turned those pieces into the systems
+        that power the language models we use every day.</p>
 
       <p class="sources">
         <span class="sources-label">Slides build on two textbooks</span>
@@ -328,7 +330,7 @@
     <!-- ==================== THE SEQUENCE ==================== -->
     <section class="seq-head">
       <p class="eyebrow">The curriculum</p>
-      <h2>Read as a sequence — each lecture builds on the one before it.</h2>
+      <h2>Each lecture builds on the one before it.</h2>
     </section>
 
     <ol class="seq">
